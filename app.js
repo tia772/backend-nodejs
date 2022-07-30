@@ -12,7 +12,7 @@ require("./helpers/mongodb.helper");
 
 // constants
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 app.use("/uploads", express.static("uploads"));
 app.use(express.json());
@@ -25,7 +25,7 @@ app.use(
 
 // routes
 app.get("/", (req, res) => {
-  res.send("Hello heroku");
+  res.send("Hello");
 });
 
 app.use("/user", userRoute);

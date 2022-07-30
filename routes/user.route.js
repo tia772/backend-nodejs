@@ -18,7 +18,7 @@ router.post("/register", validateRegisterReq, userCtrl.registerUser);
 router.post("/login", validateLoginReq, userCtrl.loginUser);
 
 router.post("/me/refresToken", userCtrl.refreshToken);
-router.get("/me", verifyAccessToken, userCtrl.getMyData);
+// router.get("/me", verifyAccessToken, userCtrl.getMyData);
 router.delete("/logout", userCtrl.logout);
 
 // exports

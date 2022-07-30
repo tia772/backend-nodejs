@@ -12,14 +12,14 @@ const createNote = async (req, res, next) => {
 
     noteBody.writter = req.body.userId;
 
-    const savedblog = await getNoteList.createBlog(blogBody);
-    res.send(savedblog);
+    const savednote = await getNoteList.createBlog(noteBody);
+    res.send(savednote);
   } catch (error) {
     next(error);
   }
 };
 
-const getNoteList = async (req, res, next) => {
+const getnoteList = async (req, res, next) => {
   try {
     const userId = req.params.userId;
     const categoryId = req.params.categoryId;
@@ -79,7 +79,7 @@ const getSingleNote = async (req, res, next) => {
 
 // exports
 module.exports = {
-  getNoteList,
+  getnoteList,
   getSingleNote,
   createNote,
 };
