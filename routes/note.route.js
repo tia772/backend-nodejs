@@ -14,7 +14,17 @@ router.get(
   verifyAccessToken,
   noteCtrl.getnoteList
 );
-// router.put("/:id", noteCtrl.NoteUpdate);
-// router.delete("/:id", noteCtrl.NoteDelete);
+router.put(
+  "/:noteId",
+  verifyAccessToken,
+  verifyAccessToken,
+  noteCtrl.NoteUpdate
+);
+router.delete(
+  "/:noteId",
+  verifyAccessToken,
+  verifyAccessToken,
+  noteCtrl.NoteDelete
+);
 
 module.exports = router;

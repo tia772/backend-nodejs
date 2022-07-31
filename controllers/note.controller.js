@@ -67,8 +67,58 @@ const getSingleNote = async (req, res, next) => {
   }
 };
 
+const NoteDelete = async (req, res, next) => {
+  const noteId = req.params.noteId;
+  try {
+    const noteId = await Note.findById(noteId);
+
+    if (!noteId) {
+      throw createErrors.NotFound("No note found");
+    }
+    if (noteId.writer.toString() !== req.userId) {
+      throw createErrors.NotFound("No authenticated");
+    }
+
+    await noteId.findByIdAndRemove(noteId);
+
+    const user = await User.findById(req.userId);
+    user.notes.pull(noteId);
+    await user.save();
+
+    res.send("note deleted");
+  } catch (error) {
+    next(error);
+  }
+};
+const NoteUpdate = async (req, res, next) => {
+  const noteId = req.params.noteId;
+  if (!noteId.isEmpty()) {
+    throw createErrors.NotFound("No note found");
+  }
+  const title = req.body.title;
+  const body = req.body.body;
+  try {
+    const note = await Note.findById(noteId);
+    if (!note) {
+      throw createErrors.NotFound("No note found");
+    }
+    if (note.writer.toString() !== req.userId) {
+      throw createErrors.NotFound("No authenticated");
+    }
+
+    note.title = title;
+    note.body = body;
+    const result = await note.save();
+    res.send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getnoteList,
   getSingleNote,
   createNote,
+  NoteDelete,
+  NoteUpdate,
 };
