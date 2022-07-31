@@ -17,5 +17,4 @@ router.post("/login", validateLoginReq, userCtrl.loginUser);
 router.post("/me/refresToken", userCtrl.refreshToken);
 router.delete("/logout", userCtrl.logout);
 
-// exports
 module.exports = router;

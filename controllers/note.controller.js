@@ -1,6 +1,6 @@
 const express = require("express");
 const createErrors = require("http-errors");
-const getNoteList,noteService = require("../services/note.service");
+const getNoteList = require("../services/note.service");
 const { Note } = require("../models/note.model");
 
 const itemsPerPage = 6;
@@ -33,10 +33,8 @@ const getnoteList = async (req, res, next) => {
     }
 
     let page = req.query.page && req.query.page > 0 ? req.query.page : 0;
-
-    const numNotes = await noteService.length(searchParams);
     let notes = await getNoteList.readNotes(searchParams, itemsPerPage, page);
-
+    const numNotes = notes.length;
     let totalPages = Math.ceil(numNotes / itemsPerPage);
     let currentPage = page + 1;
 
@@ -46,22 +44,6 @@ const getnoteList = async (req, res, next) => {
       totalPages: totalPages,
       currentPage: currentPage,
     });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const getSingleNote = async (req, res, next) => {
-  try {
-    let searchParams = { _id: req.params.noteId };
-    let selectFields = "";
-    let note = await noteService.readnotes(searchParams, selectFields);
-
-    note = note[0];
-    if (!note) {
-      throw createErrors.NotFound("No note found");
-    }
-    res.send(note);
   } catch (error) {
     next(error);
   }
