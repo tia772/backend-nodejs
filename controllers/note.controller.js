@@ -1,6 +1,6 @@
 const express = require("express");
 const createErrors = require("http-errors");
-const getNoteList = require("../services/note.service");
+const getNoteList,noteService = require("../services/note.service");
 const { Note } = require("../models/note.model");
 
 const itemsPerPage = 6;
