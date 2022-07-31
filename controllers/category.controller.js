@@ -8,7 +8,7 @@ const createCategory = async (req, res, next) => {
     let categoryBody = req.body;
 
     const savedCategory = await categoryService.createCategory(categoryBody);
-    res.send(savedCategory);
+    res.status(200).send(savedCategory);
   } catch (error) {
     next(error);
   }
@@ -16,9 +16,8 @@ const createCategory = async (req, res, next) => {
 
 const getCategories = async (req, res, next) => {
   try {
-    let searchParams = {};
-    const categories = await categoryService.readCategory(searchParams);
-    res.send(categories);
+    const categories = await categoryService.readCategory();
+    res.status(200).send(categories);
   } catch (error) {
     next(error);
   }
@@ -32,7 +31,7 @@ const categoryDelete = async (req, res, next) => {
       throw createErrors.NotFound("No category found");
     }
     await Category.findByIdAndRemove(categoryId);
-    res.send("category deleted");
+    res.status(200).send("category deleted");
   } catch (error) {
     next(error);
   }
@@ -52,7 +51,7 @@ const categoryUpdate = async (req, res, next) => {
     }
     category.name = name;
     const result = await category.save();
-    res.send(result);
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }

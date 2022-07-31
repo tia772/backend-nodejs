@@ -27,7 +27,7 @@ const registerUser = async (req, res, next) => {
       html
     );
 
-    res.send({
+    res.status(200).send({
       user,
       accessToken,
       refreshToken,
@@ -59,7 +59,7 @@ const loginUser = async (req, res, next) => {
 
     const user = utils.makeObjectSelected(findUser, ["_id", "first_name"]);
 
-    res.send({
+    res.status(200).send({
       user,
       accessToken,
       refreshToken,
@@ -88,7 +88,7 @@ const refreshToken = async (req, res, next) => {
 
     const accessToken = await jwtHelper.signAccessToken(userId);
     const refreshToken = await jwtHelper.signRefreshToken(userId);
-    res.send({ accessToken, refreshToken });
+    res.status(200).send({ accessToken, refreshToken });
   } catch (error) {
     next(error);
   }

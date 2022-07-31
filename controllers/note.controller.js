@@ -12,7 +12,7 @@ const createNote = async (req, res, next) => {
     noteBody.writer = req.body.userId;
 
     const savednote = await getNoteList.createNote(noteBody);
-    res.send(savednote);
+    res.status(200).send(savednote);
   } catch (error) {
     next(error);
   }
@@ -38,7 +38,7 @@ const getnoteList = async (req, res, next) => {
     let totalPages = Math.ceil(numNotes / itemsPerPage);
     let currentPage = page + 1;
 
-    res.send({
+    res.status(200).send({
       result: notes,
       totalNotes: numNotes,
       totalPages: totalPages,
@@ -91,7 +91,7 @@ const NoteUpdate = async (req, res, next) => {
     note.title = title;
     note.body = body;
     const result = await note.save();
-    res.send(result);
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }
@@ -99,7 +99,6 @@ const NoteUpdate = async (req, res, next) => {
 
 module.exports = {
   getnoteList,
-  getSingleNote,
   createNote,
   NoteDelete,
   NoteUpdate,

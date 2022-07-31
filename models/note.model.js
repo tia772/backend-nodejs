@@ -1,4 +1,3 @@
-// imports
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const NoteSchema = new Schema(
