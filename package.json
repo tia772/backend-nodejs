@@ -1,7 +1,7 @@
 {
-  "name": "blog-app-rest_api",
+  "name": "app-rest_api",
   "version": "1.0.0",
-  "description": "This is the backend of a blog app",
+  "description": " ",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"

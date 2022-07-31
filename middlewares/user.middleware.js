@@ -1,4 +1,3 @@
-// imports
 const Joi = require("joi");
 const {
   userSchema,
@@ -24,7 +23,6 @@ const validateLoginReq = async (req, res, next) => {
   }
 };
 
-// exports
 module.exports = {
   validateRegisterReq,
   validateLoginReq,

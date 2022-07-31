@@ -1,9 +1,6 @@
-// imports
 const express = require("express");
 const createErrors = require("http-errors");
 const { User } = require("../models/user.model");
-
-// CRUD
 
 const createUser = async (userbody) => {
   try {
@@ -29,13 +26,12 @@ const findUniqueUser = async (searchParams, selectFields = "") => {
     return Promise.resolve(userResult);
   } catch (error) {
     if (error.name == "CastError") {
-      error = createErrors.BadRequest("Invalid bloggerId");
+      error = createErrors.BadRequest("Invalid Id");
     }
     return Promise.reject(error);
   }
 };
 
-// exports
 module.exports = {
   createUser,
   findUniqueUser,

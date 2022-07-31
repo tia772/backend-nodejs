@@ -1,4 +1,3 @@
-// imports
 const express = require("express");
 const createErrors = require("http-errors");
 const getNoteList = require("../services/note.service");
@@ -10,9 +9,9 @@ const createNote = async (req, res, next) => {
   try {
     let noteBody = req.body;
 
-    noteBody.writter = req.body.userId;
+    noteBody.writer = req.body.userId;
 
-    const savednote = await getNoteList.createBlog(noteBody);
+    const savednote = await getNoteList.createNote(noteBody);
     res.send(savednote);
   } catch (error) {
     next(error);
@@ -26,28 +25,19 @@ const getnoteList = async (req, res, next) => {
     const tagId = req.params.tagId;
 
     let searchParams = {};
-    if (userId && userId.toLowerCase() != "all") {
-      searchParams.writter = userId;
-    }
-    if (categoryId && categoryId.toLowerCase() != "all") {
+    if (categoryId) {
       searchParams.category = categoryId;
     }
-    if (tagId && tagId.toLowerCase() != "all") {
+    if (tagId) {
       searchParams.tag = tagId;
     }
 
-    let perPage = itemsPerPage;
-    let page = req.query.page && req.query.page > 0 ? req.query.page - 1 : 0;
+    let page = req.query.page && req.query.page > 0 ? req.query.page : 0;
 
-    const numNotes = await noteService.countNotes(searchParams);
-    let notes = await getNoteList.readNotes(
-      searchParams,
-      selectFields,
-      perPage,
-      page
-    );
+    const numNotes = await noteService.length(searchParams);
+    let notes = await getNoteList.readNotes(searchParams, itemsPerPage, page);
 
-    let totalPages = Math.ceil(numNotes / perPage);
+    let totalPages = Math.ceil(numNotes / itemsPerPage);
     let currentPage = page + 1;
 
     res.send({
@@ -77,7 +67,6 @@ const getSingleNote = async (req, res, next) => {
   }
 };
 
-// exports
 module.exports = {
   getnoteList,
   getSingleNote,

@@ -14,7 +14,6 @@ exports.send = function (from, to, subject, html) {
     from: from,
     to: to,
     subject: subject,
-
-    html: html, // html body e.g. '<b>Hello world?</b>'
+    html: html,
   });
 };

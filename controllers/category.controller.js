@@ -1,8 +1,7 @@
-// imports
 const express = require("express");
 const createErrors = require("http-errors");
 const categoryService = require("../services/category.service");
-const blogService = require("../services/note.service");
+const noteService = require("../services/note.service");
 const { Category } = require("../models/category.model");
 
 const createCategory = async (req, res, next) => {

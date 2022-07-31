@@ -1,4 +1,3 @@
-// import
 const jwt = require("jsonwebtoken");
 const createErrors = require("http-errors");
 
@@ -87,7 +86,6 @@ const verifyRefreshToken = async (refreshToken) => {
   }
 };
 
-// exports
 module.exports = {
   signAccessToken,
   verifyAccessToken,

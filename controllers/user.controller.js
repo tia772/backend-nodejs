@@ -1,4 +1,3 @@
-// imports
 const express = require("express");
 const createErrors = require("http-errors");
 const userService = require("../services/user.service");
@@ -96,7 +95,7 @@ const refreshToken = async (req, res, next) => {
 };
 
 const logout = async (req, res, next) => {
-  res.send("logout is not implemented yet");
+  req.logout();
 };
 module.exports = {
   registerUser,

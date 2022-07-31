@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const NoteSchema = new Schema(
   {
-    writter: {
+    writer: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -35,7 +35,6 @@ const NoteSchema = new Schema(
 
 const Note = mongoose.model("Note", NoteSchema);
 
-// exports
 module.exports = {
   Note,
 };
