@@ -1,12 +1,12 @@
 const express = require("express");
-const createErrors = require("http-errors");
 const categoryCtrl = require("../controllers/category.controller");
+const { validateCategoryReq } = require("../middlewares/category.middleware");
 
 const router = express.Router();
 
-router.post("/", categoryCtrl.createCategory);
+router.post("/", validateCategoryReq, categoryCtrl.createCategory);
 router.get("/", categoryCtrl.getCategories);
-router.put("/:CategoryId", categoryCtrl.categoryUpdate);
-router.delete("/:CategoryId", categoryCtrl.categoryDelete);
+router.put("/:id", validateCategoryReq, categoryCtrl.categoryUpdate);
+router.delete("/:id", categoryCtrl.categoryDelete);
 
 module.exports = router;

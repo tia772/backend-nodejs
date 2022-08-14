@@ -1,47 +1,83 @@
-const express = require("express");
-const createErrors = require("http-errors");
 const { Note } = require("../models/note.model");
 
+const tagServices = require("./tag.service");
+
 const createNote = async (noteBody) => {
-  try {
-    const newNote = new Note(noteBody);
-    let savedNote = await newNote.save();
+  const newNote = new Track(noteBody);
+  const result = await newNote.save();
+  return result._id;
+};
 
-    savedNote = await savedNote
-      .populate("writer", "first_name last_name joined")
-      .populate("category", "name")
-      .populate("tag", "name")
-      .execPopulate();
+const getNoteList = async () => {
+  const result = await Note.find();
+  return result;
+};
 
-    return Promise.resolve(savedNote);
-  } catch (error) {
-    return Promise.reject(error);
+const NoteUpdate = async (values, id) => {
+  const note = await Note.findById(id);
+
+  if (note) {
+    await Note.updateOne(
+      { _id: id },
+      {
+        $set: values,
+      },
+      { omitUndefined: true }
+    );
+
+    return 200;
+  } else {
+    return 404;
   }
 };
 
-const readNotes = async (
-  searchParams = {},
-  selectFields = "",
-  perPage = 99999999,
-  page = 0
-) => {
-  try {
-    const Notes = await Note.find(searchParams)
-      .limit(perPage)
-      .populate("writer", "first_name last_name joined")
-      .populate("category", "name")
-      .populate("tag", "name")
-      .select(selectFields);
-    return Promise.resolve(notes);
-  } catch (error) {
-    if (error.name == "CastError") {
-      error = createErrors.BadRequest("Invalid Id");
+const NoteDelete = async (id) => {
+  const note = await Note.findById(id);
+
+  if (note) {
+    await Note.deleteOne({ _id: id });
+
+    return 200;
+  } else {
+    return 404;
+  }
+};
+
+const getNotesByCategoryId = async (id) => {
+  const notes = await Note.find({ categoryId: id });
+
+  return notes;
+};
+
+const getSortedNoteByTag = async (parameters) => {
+  const page = parameters.page - 1;
+  const limit = parameters.limit;
+
+  if (parameters.tagName) {
+    const tag = await tagServices.searchTag(parameters.tagName);
+
+    if (tag) {
+      const notes = await Note.aggregate([
+        { $match: { tagId: tag._id } },
+        { $sort: { updatedDate: -1 } },
+        { $skip: page * limit },
+        { $limit: limit },
+      ]);
+
+      return tag;
+    } else {
+      return;
     }
-    return Promise.reject(error);
+  } else {
+    return;
   }
 };
 
 module.exports = {
   createNote,
-  readNotes,
+  getNoteList,
+  NoteUpdate,
+  NoteDelete,
+  getNotesByCategoryId,
+  getSortedNoteByTag,
 };

@@ -1,6 +1,4 @@
-const Joi = require("joi");
 const {
-  userSchema,
   userRegisterSchema,
   userLoginSchema,
 } = require("../validators/user.validator");

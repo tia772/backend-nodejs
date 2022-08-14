@@ -1,59 +1,61 @@
-const express = require("express");
-const createErrors = require("http-errors");
-const categoryService = require("../services/category.service");
-const { Category } = require("../models/category.model");
+const sender = require("../middlewares/responseSender");
+const services = require("../services/category.service");
 
 const createCategory = async (req, res, next) => {
-  try {
-    let categoryBody = req.body;
+  const category = {
+    name: req.body.name,
+    createdDate: new Date(),
+  };
 
-    const savedCategory = await categoryService.createCategory(categoryBody);
-    res.status(200).send(savedCategory);
-  } catch (error) {
-    next(error);
+  try {
+    const result = await services.createCategory(category);
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 
 const getCategories = async (req, res, next) => {
   try {
-    const categories = await categoryService.readCategory();
-    res.status(200).send(categories);
-  } catch (error) {
-    next(error);
+    const result = await services.getCategories();
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 
 const categoryDelete = async (req, res, next) => {
   try {
-    const Category = await Category.findById(CategoryId);
+    const result = await services.categoryDelete(req.params.id);
 
-    if (!Category) {
-      throw createErrors.NotFound("No category found");
-    }
-    await Category.findByIdAndRemove(categoryId);
-    res.status(200).send("category deleted");
-  } catch (error) {
-    next(error);
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 
 const categoryUpdate = async (req, res, next) => {
-  const CategoryId = req.params.CategoryId;
-  if (!CategoryId.isEmpty()) {
-    throw createErrors.NotFound("id could not be empty");
-  }
-  const name = req.body.name;
+  const updatedValues = {
+    name: req.body.name,
+    updatedDate: new Date(),
+  };
 
   try {
-    const category = await Category.findById(CategoryId);
-    if (!category) {
-      throw createErrors.NotFound("No category found");
-    }
-    category.name = name;
-    const result = await category.save();
-    res.status(200).send(result);
-  } catch (error) {
-    next(error);
+    const result = await services.categoryUpdate(updatedValues, req.params.id);
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 

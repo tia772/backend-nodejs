@@ -1,31 +1,56 @@
-const express = require("express");
-const createErrors = require("http-errors");
 const { Category } = require("../models/category.model");
+const noteServices = require("./note.service.js");
 
 const createCategory = async (categoryBody) => {
-  try {
-    const newCategory = new Category(categoryBody);
-    const savedCategory = await newCategory.save();
-    return Promise.resolve(savedCategory);
-  } catch (error) {
-    if (error.code && error.code == 11000) {
-      error = createErrors.Forbidden(`${categoryBody.name} already exists`);
-      return Promise.reject(error);
-    }
-    return Promise.reject(error);
+  const newCategory = new Category(categoryBody);
+  const result = await newCategory.save();
+  return result._id;
+};
+
+const getCategories = async () => {
+  const result = await Category.find();
+  return result;
+};
+
+const categoryUpdate = async (values, id) => {
+  const category = await Category.findById(id);
+
+  if (category) {
+    await Category.updateOne(
+      { _id: id },
+      {
+        $set: values,
+      },
+      { omitUndefined: true }
+    );
+
+    return 200;
+  } else {
+    return 404;
   }
 };
 
-const readCategory = async () => {
-  try {
-    const categories = await Category.find().select("name");
-    return Promise.resolve(categories);
-  } catch (error) {
-    return Promise.reject(error);
+const categoryDelete = async (id) => {
+  const category = await Category.findById(id);
+
+  if (category) {
+    const notes = await noteServices.getNotesByCategoryId(id);
+
+    if (notes) {
+      return 409;
+    } else {
+      await Category.deleteOne({ _id: id });
+
+      return 200;
+    }
+  } else {
+    return 404;
   }
 };
 
 module.exports = {
   createCategory,
-  readCategory,
+  getCategories,
+  categoryUpdate,
+  categoryDelete,
 };

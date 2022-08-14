@@ -1,38 +1,41 @@
-const express = require("express");
-const createErrors = require("http-errors");
 const { User } = require("../models/user.model");
+const Note = require("../models/note.model");
 
 const createUser = async (userbody) => {
   try {
     const newUser = new User(userbody);
     const savedUser = await newUser.save();
-    return Promise.resolve(savedUser);
+    return savedUser;
   } catch (error) {
-    if (error.code && error.code == 11000) {
-      error = createErrors.Conflict(`${userbody.email} already exists`);
-      return Promise.reject(error);
-    }
-    return Promise.reject(error);
+    return 404;
   }
+  return 404;
 };
 
 const findUniqueUser = async (searchParams, selectFields = "") => {
   try {
     const userResult = await User.findOne(searchParams).select(selectFields);
     if (!userResult) {
-      throw createErrors.NotFound("Incorrect information");
+      return 404;
     }
 
-    return Promise.resolve(userResult);
+    return userResult;
   } catch (error) {
-    if (error.name == "CastError") {
-      error = createErrors.BadRequest("Invalid Id");
-    }
-    return Promise.reject(error);
+    return 404;
   }
+};
+
+const getNbOfNote = async () => {
+  const result = await Note.aggregate([
+    { $project: { name: { $toUpper: "$_id" }, _id: 0 } },
+    { $group: { _id: { writerId: "$writerId" }, numberOfNotes: { $sum: 1 } } },
+  ]);
+
+  return result;
 };
 
 module.exports = {
   createUser,
   findUniqueUser,
+  getNbOfNote,
 };

@@ -1,99 +1,82 @@
-const express = require("express");
-const createErrors = require("http-errors");
-const getNoteList = require("../services/note.service");
-const { Note } = require("../models/note.model");
-
-const itemsPerPage = 6;
+const services = require("../services/note.service");
+const sender = require("../middlewares/responseSender");
 
 const createNote = async (req, res, next) => {
+  const note = {
+    title: req.body.title,
+    body: req.body.body,
+    categoryId: req.params.categoryId,
+    tagId: req.params.tagId,
+  };
+
   try {
-    let noteBody = req.body;
+    const result = await services.createNote(note);
 
-    noteBody.writer = req.body.userId;
+    req.result = result;
 
-    const savednote = await getNoteList.createNote(noteBody);
-    res.status(200).send(savednote);
-  } catch (error) {
-    next(error);
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 
 const getnoteList = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
-    const categoryId = req.params.categoryId;
-    const tagId = req.params.tagId;
-
-    let searchParams = {};
-    if (categoryId) {
-      searchParams.category = categoryId;
-    }
-    if (tagId) {
-      searchParams.tag = tagId;
-    }
-
-    let page = req.query.page && req.query.page > 0 ? req.query.page : 0;
-    let notes = await getNoteList.readNotes(searchParams, itemsPerPage, page);
-    const numNotes = notes.length;
-    let totalPages = Math.ceil(numNotes / itemsPerPage);
-    let currentPage = page + 1;
-
-    res.status(200).send({
-      result: notes,
-      totalNotes: numNotes,
-      totalPages: totalPages,
-      currentPage: currentPage,
-    });
-  } catch (error) {
-    next(error);
+    const result = await services.getNoteList();
+    req.result = result;
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 
 const NoteDelete = async (req, res, next) => {
-  const noteId = req.params.noteId;
   try {
-    const noteId = await Note.findById(noteId);
-
-    if (!noteId) {
-      throw createErrors.NotFound("No note found");
-    }
-    if (noteId.writer.toString() !== req.userId) {
-      throw createErrors.NotFound("No authenticated");
-    }
-
-    await noteId.findByIdAndRemove(noteId);
-
-    const user = await User.findById(req.userId);
-    user.notes.pull(noteId);
-    await user.save();
-
-    res.send("note deleted");
-  } catch (error) {
-    next(error);
+    const result = await services.NoteDelete(req.params.id);
+    req.result = result;
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 const NoteUpdate = async (req, res, next) => {
-  const noteId = req.params.noteId;
-  if (!noteId.isEmpty()) {
-    throw createErrors.NotFound("No note found");
-  }
-  const title = req.body.title;
-  const body = req.body.body;
-  try {
-    const note = await Note.findById(noteId);
-    if (!note) {
-      throw createErrors.NotFound("No note found");
-    }
-    if (note.writer.toString() !== req.userId) {
-      throw createErrors.NotFound("No authenticated");
-    }
+  const updatedValues = {
+    title: req.body.title,
+    body: req.body.body,
+    categoryId: req.body.categoryId,
+    tagId: req.body.tagId,
+  };
 
-    note.title = title;
-    note.body = body;
-    const result = await note.save();
-    res.status(200).send(result);
-  } catch (error) {
-    next(error);
+  try {
+    const result = await services.NoteUpdate(updatedValues, req.params.id);
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+const getSortedNoteByTag = async (req, res, next) => {
+  let parameters = {
+    tagId: req.params.tagId,
+  };
+
+  if (Object.keys(req.query).length > 0) {
+    parameters.tagName = req.query.tag;
+    parameters.page = parseInt(req.query.page);
+    parameters.limit = parseInt(req.query.limit);
+  }
+
+  try {
+    const result = await services.getSortedNoteByTag(parameters);
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
 
@@ -102,4 +85,5 @@ module.exports = {
   createNote,
   NoteDelete,
   NoteUpdate,
+  getSortedNoteByTag,
 };

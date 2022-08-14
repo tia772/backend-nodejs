@@ -1,12 +1,6 @@
-const express = require("express");
-const createErrors = require("http-errors");
 const userService = require("../services/user.service");
-const { User } = require("../models/user.model");
 const jwtHelper = require("../helpers/jwt.helper");
-const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const client = require("../helpers/jwt.helper");
-const fs = require("fs");
 const utils = require("../util");
 const mailer = require("../helpers/mailer");
 
@@ -51,7 +45,9 @@ const loginUser = async (req, res, next) => {
     );
 
     if (!passMatch) {
-      throw createErrors.BadRequest("Incorrect email or password");
+      const error = new Error("incorrect email ");
+      error.statusCode = 404;
+      throw error;
     }
 
     const accessToken = await jwtHelper.signAccessToken(findUser._id);
@@ -65,10 +61,9 @@ const loginUser = async (req, res, next) => {
       refreshToken,
     });
   } catch (error) {
-    if (error.status && error.status == 404) {
-      error = createErrors.BadRequest("Incorrect email or password");
-      next(error);
-    }
+    error = new Error("error");
+    error.statusCode = 404;
+    throw error;
     next(error);
   }
 };
@@ -78,12 +73,16 @@ const refreshToken = async (req, res, next) => {
     let oldRefreshToken = req.body.refreshToken;
 
     if (!oldRefreshToken) {
-      throw createErrors.Forbidden("No refreshToken");
+      const error = new Error("error ");
+      error.statusCode = 404;
+      throw error;
     }
 
     const userId = await jwtHelper.verifyRefreshToken(oldRefreshToken);
     if (!userId) {
-      throw createErrors.Forbidden("No refreshToken");
+      const error = new Error("error");
+      error.statusCode = 404;
+      throw error;
     }
 
     const accessToken = await jwtHelper.signAccessToken(userId);
@@ -97,9 +96,23 @@ const refreshToken = async (req, res, next) => {
 const logout = async (req, res, next) => {
   req.logout();
 };
+
+const getNbOfNote = async (req, res, next) => {
+  try {
+    const result = await services.getNbOfNote();
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   refreshToken,
   logout,
+  getNbOfNote,
 };

@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const createErrors = require("http-errors");
 
 const signAccessToken = async (userId) => {
   try {
@@ -14,37 +13,43 @@ const signAccessToken = async (userId) => {
     };
 
     const accessToken = await jwt.sign(payload, privateKey, options);
-    return Promise.resolve(accessToken);
+    return accessToken;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
 const verifyAccessToken = async (req, res, next) => {
   try {
     if (!req.headers["authorization"]) {
-      throw createErrors.Unauthorized("No accessToken");
+      const error = new Error("No accessToken");
+      error.statusCode = 403;
+      throw error;
     }
 
     const accessToken = req.headers["authorization"].split(" ")[1];
     if (!accessToken) {
-      throw createErrors.Unauthorized("No accessToken");
+      const error = new Error("No accessToken");
+      error.statusCode = 403;
+      throw error;
     }
 
     const decoded = await jwt.verify(accessToken, process.env.accessTokenKey);
 
     if (!decoded) {
-      throw createErrors.Unauthorized("No accessToken");
+      const error = new Error("No accessToken");
+      error.statusCode = 403;
+      throw error;
     }
 
-    req.body.userId = JSON.parse(decoded.aud);
+    req.userId = JSON.parse(decoded.aud);
     next();
   } catch (error) {
     if (
       error.name == "TokenExpiredError" ||
       error.name == "JsonWebTokenError"
     ) {
-      error = createErrors.Unauthorized(error.name);
+      throw error;
     }
     next(error);
   }
@@ -63,9 +68,9 @@ const signRefreshToken = async (userId) => {
     };
 
     const refreshToken = await jwt.sign(payload, privateKey, options);
-    return Promise.resolve(refreshToken);
+    return refreshToken;
   } catch (error) {
-    return Promise.reject(error);
+    throw error;
   }
 };
 
@@ -74,15 +79,10 @@ const verifyRefreshToken = async (refreshToken) => {
     const decoded = await jwt.verify(refreshToken, process.env.refreshTokenKey);
     const userId = JSON.parse(decoded.aud);
 
-    return Promise.resolve(userId);
+    return userId;
   } catch (error) {
-    if (
-      error.name == "TokenExpiredError" ||
-      error.name == "JsonWebTokenError"
-    ) {
-      error = createErrors.Forbidden(error.name);
-    }
-    return Promise.reject(error);
+    if (error.name == "TokenExpiredError" || error.name == "JsonWebTokenError")
+      throw error;
   }
 };
 
