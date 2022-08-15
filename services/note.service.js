@@ -2,9 +2,15 @@ const { Note } = require("../models/note.model");
 
 const tagServices = require("./tag.service");
 
-const createNote = async (noteBody) => {
-  const newNote = new Track(noteBody);
-  const result = await newNote.save();
+const createNote = async () => {
+  const note = {
+    title: req.body.title,
+    body: req.body.body,
+    categoryId: req.params.categoryId,
+    tagId: req.params.tagId,
+  };
+
+  const result = await note.save();
   return result._id;
 };
 

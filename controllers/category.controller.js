@@ -2,11 +2,6 @@ const sender = require("../middlewares/responseSender");
 const services = require("../services/category.service");
 
 const createCategory = async (req, res, next) => {
-  const category = {
-    name: req.body.name,
-    createdDate: new Date(),
-  };
-
   try {
     const result = await services.createCategory(category);
 

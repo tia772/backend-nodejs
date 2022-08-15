@@ -1,9 +1,12 @@
 const { Category } = require("../models/category.model");
 const noteServices = require("./note.service.js");
 
-const createCategory = async (categoryBody) => {
-  const newCategory = new Category(categoryBody);
-  const result = await newCategory.save();
+const createCategory = async () => {
+  const category = {
+    name: req.body.name,
+    createdDate: new Date(),
+  };
+  const result = await category.save();
   return result._id;
 };
 

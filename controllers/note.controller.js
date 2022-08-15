@@ -2,13 +2,6 @@ const services = require("../services/note.service");
 const sender = require("../middlewares/responseSender");
 
 const createNote = async (req, res, next) => {
-  const note = {
-    title: req.body.title,
-    body: req.body.body,
-    categoryId: req.params.categoryId,
-    tagId: req.params.tagId,
-  };
-
   try {
     const result = await services.createNote(note);
 
