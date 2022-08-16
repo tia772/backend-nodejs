@@ -73,10 +73,31 @@ const getSortedNoteByTag = async (req, res, next) => {
   }
 };
 
+const getNote = async (req, res, next) => {
+  let parameters = {
+    categoryId: req.params.categoryId,
+  };
+
+  if (Object.keys(req.query).length > 0) {
+    parameters.categoryName = req.query.category;
+  }
+
+  try {
+    const result = await services.getNote(parameters);
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
 module.exports = {
   getnoteList,
   createNote,
   NoteDelete,
   NoteUpdate,
   getSortedNoteByTag,
+  getNote,
 };

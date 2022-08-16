@@ -51,9 +51,72 @@ const categoryDelete = async (id) => {
   }
 };
 
+const getCategoriesUser = async () => {
+  const result = await Category.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: {
+        path: "$user",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "note",
+        localField: "_id",
+        foreignField: "userId",
+        as: "note",
+      },
+    },
+    {
+      $lookup: {
+        from: "note",
+        localField: "_id",
+        foreignField: "categoryId",
+        as: "note",
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        id: "$_id",
+        name: 1,
+        createdDate: 1,
+        updatedDate: 1,
+        createdBy: "$user.email",
+        UserCount: { $size: { $ifNull: ["$user", []] } },
+        noteCount: { $size: { $ifNull: ["$note", []] } },
+      },
+    },
+    {
+      $sort: {
+        createdDate: -1,
+      },
+    },
+  ]);
+  return result;
+};
+
+const searchCategory = async (searchQuery) => {
+  const formattedExpression = `^${searchQuery}`;
+  const category = await Category.findOne({
+    name: { $regex: formattedExpression, $options: "i" },
+  });
+
+  return category;
+};
 module.exports = {
   createCategory,
   getCategories,
   categoryUpdate,
   categoryDelete,
+  getCategoriesUser,
+  searchCategory,
 };

@@ -8,5 +8,6 @@ router.post("/", validateCategoryReq, categoryCtrl.createCategory);
 router.get("/", categoryCtrl.getCategories);
 router.put("/:id", validateCategoryReq, categoryCtrl.categoryUpdate);
 router.delete("/:id", categoryCtrl.categoryDelete);
+router.get("/", categoryCtrl.getCategoriesUser);
 
 module.exports = router;

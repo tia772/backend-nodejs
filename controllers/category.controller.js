@@ -54,9 +54,22 @@ const categoryUpdate = async (req, res, next) => {
   }
 };
 
+const getCategoriesUser = async (req, res, next) => {
+  try {
+    const result = await services.getCategoriesUser();
+
+    req.result = result;
+
+    sender(req, res);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
 module.exports = {
   createCategory,
   categoryDelete,
   getCategories,
   categoryUpdate,
+  getCategoriesUser,
 };

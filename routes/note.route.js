@@ -15,5 +15,6 @@ router.get("/", verifyAccessToken, noteCtrl.getnoteList);
 router.put("/:id", verifyAccessToken, validateNoteReq, noteCtrl.NoteUpdate);
 router.delete("/:id", verifyAccessToken, noteCtrl.NoteDelete);
 router.get("/:tagId", verifyAccessToken, noteCtrl.getSortedNoteByTag);
+router.get("/:categoryId", verifyAccessToken, noteCtrl.getNote);
 
 module.exports = router;

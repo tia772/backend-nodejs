@@ -1,6 +1,7 @@
 const { Note } = require("../models/note.model");
 
 const tagServices = require("./tag.service");
+const categoryServices = require("./category.service");
 
 const createNote = async () => {
   const note = {
@@ -79,6 +80,54 @@ const getSortedNoteByTag = async (parameters) => {
   }
 };
 
+const getNote = async (parameters) => {
+  if (parameters.CategoryName) {
+    const category = await categoryServices.searchCategory(
+      parameters.CategoryName
+    );
+
+    if (category) {
+      const notes = await Note.aggregate([
+        {
+          $lookup: {
+            from: "note",
+            localField: "_id",
+            foreignField: "categoryId",
+            as: "note",
+          },
+        },
+        {
+          $unwind: {
+            path: "$note",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+
+        {
+          $project: {
+            _id: 0,
+            id: "$_id",
+            title: 1,
+            category: "$note.categoryId",
+            createdDate: 1,
+            noteCount: { $size: { $ifNull: ["$note", []] } },
+          },
+        },
+        {
+          $sort: {
+            createdDate: -1,
+          },
+        },
+      ]);
+
+      return category;
+    } else {
+      return;
+    }
+  } else {
+    return;
+  }
+};
 module.exports = {
   createNote,
   getNoteList,
@@ -86,4 +135,5 @@ module.exports = {
   NoteDelete,
   getNotesByCategoryId,
   getSortedNoteByTag,
+  getNote,
 };
